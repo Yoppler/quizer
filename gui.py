@@ -92,9 +92,5 @@ class MainWindow(QMainWindow):
         self.page_container.setCurrentIndex(page.value)
         self.pages[page.value].focus(*args, **kwargs)
 
-
-app = QApplication(sys.argv)
-view = View()
-window = MainWindow(view)
-window.show()
-app.exec()
+    def closeEvent(self, event):
+        event.accept()
