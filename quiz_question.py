@@ -31,31 +31,12 @@ class QuizQuestion(GuiPage):
         self.quiz = None
 
     def setup(self):
-        layout = QGridLayout()
+        self.widget_layout = QGridLayout()
         self.cur_question = None
         self.question = QLabel("Default Question Text")
         self.question.setWordWrap(True)
         self.question.setStyleSheet(self.primary.ss)
-        answerA = QLabel("Answer A Text")
-        answerA.setStyleSheet(self.primary.ss)
-        answerA.setWordWrap(True)
-        answerB = QLabel("Answer B Text")
-        answerB.setStyleSheet(self.primary.ss)
-        answerB.setWordWrap(True)
-        answerC = QLabel("Answer C Text")
-        answerC.setStyleSheet(self.primary.ss)
-        answerC.setWordWrap(True)
-        answerD = QLabel("Answer D Text")
-        answerD.setStyleSheet(self.primary.ss)
-        answerD.setWordWrap(True)
-        answerA_cb = QCheckBox()
-        answerB_cb = QCheckBox()
-        answerC_cb = QCheckBox()
-        answerD_cb = QCheckBox()
-        self.answers.append(answer_gui(answerA, answerA_cb))
-        self.answers.append(answer_gui(answerB, answerB_cb))
-        self.answers.append(answer_gui(answerC, answerC_cb))
-        self.answers.append(answer_gui(answerD, answerD_cb))
+
         back_btn = QPushButton("←")
         back_btn.setStyleSheet(self.primary.ss)
         forward_btn = QPushButton("→")
@@ -69,21 +50,28 @@ class QuizQuestion(GuiPage):
         back_btn.clicked.connect(self.back_clicked)
         forward_btn.clicked.connect(self.forward_clicked)
 
-        layout.addWidget(self.question,0,0,5,6)
-        layout.addWidget(answerA,7,0,1,5)
-        layout.addWidget(answerA_cb,7,5,1,1)
-        layout.addWidget(answerB,8,0,1,5)
-        layout.addWidget(answerB_cb,8,5,1,1)
-        layout.addWidget(answerC,9,0,1,5)
-        layout.addWidget(answerC_cb,9,5,1,1)
-        layout.addWidget(answerD,10,0,1,5)
-        layout.addWidget(answerD_cb,10,5,1,1)
-        layout.addWidget(back_btn,11,0,1,2)
-        layout.addWidget(self.progress,11,2,1,2)
-        layout.addWidget(forward_btn,11,4,1,2)
+        self.widget_layout.addWidget(self.question, 0, 0, 5, 6)
+        self.init_answers(4, 7)
 
-        self.setLayout(layout)
+        self.widget_layout.addWidget(back_btn, 11, 0, 1, 2)
+        self.widget_layout.addWidget(self.progress, 11, 2, 1, 2)
+        self.widget_layout.addWidget(forward_btn, 11, 4, 1, 2)
+
+        self.setLayout(self.widget_layout)
         self.show()
+
+    def init_answers(self, count, start_row):
+        for i in range(count):
+            answer_line = QLabel()
+            answer_line.setStyleSheet(self.primary.ss)
+            answer_line.setWordWrap(True)
+
+            answer_cb = QCheckBox()
+            self.answers.append(answer_gui(answer_line, answer_cb))
+
+            row = start_row + i
+            self.widget_layout.addWidget(answer_line, row, 0, 1, 5)
+            self.widget_layout.addWidget(answer_cb, row, 5, 1, 1)
 
     def refresh(self):
         if self.cur_question is None:
