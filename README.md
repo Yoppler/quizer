@@ -1,9 +1,9 @@
 # Quizer - A multiple-choice quiz program
 
 
-'''
+```
 $ python ./main.py
-'''
+```
 
 ### To-Do List
 - [ ] Implement variable answer quantities
