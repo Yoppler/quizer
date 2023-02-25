@@ -2,8 +2,12 @@
 
 
 ```
+$ pip install -r ./requirements.txt
 $ python ./main.py
 ```
+### Requirements
+* Python 3.7+
+* PyQt6
 
 ### To-Do List
 - [ ] Implement variable answer quantities
