@@ -1,6 +1,7 @@
 from copy import deepcopy
 from dataclasses import dataclass, field
 
+
 class QuizHandler:
     def __init__(self, quiz):
         self.quiz = quiz
@@ -9,9 +10,6 @@ class QuizHandler:
         self.handler_questions = self.create_handler_questions()
         self.incorrect = []
 
-        # Using this to implement a previous / next questions
-        self.run_questions = []
-    
     def create_handler_questions(self):
         """Enables QuestionHistory for back/forward navigation"""
         q_history = []
@@ -23,13 +21,14 @@ class QuizHandler:
         return q_history
 
     def get_question(self):
+        """Returns the current question"""
         index = self.cur_question
         if self.cur_question > self.total_questions - 1:
             raise NoMoreQuestions
         return self.handler_questions[index]
 
     def submit_answer(self, question):
-        '''takes QuestionHistory object'''
+        '''takes QuestionHistory object, moves to next question'''
         self.handler_questions[self.cur_question] = question
         self.cur_question += 1
 
@@ -40,15 +39,6 @@ class QuizHandler:
 
         question = self.handler_questions[index]
         self.cur_question -= 1
-        return question
-
-    def next_question(self):
-        index = self.cur_question + 1
-        if index >= len(self.run_questions):
-            raise NoMoreQuestions
-
-        question = self.run_questions[index]
-        self.cur_question += 1
         return question
 
     def calculate_score(self):
@@ -76,13 +66,23 @@ class QuizHandler:
 
     def restart(self):
         self.cur_question = 0
-        self.run_questions = []
-    
+        self.clear_answers()
+        self.incorrect.clear()
+
+    def clear_answers(self):
+        """Clear submitted answers so user has a fresh quiz"""
+        for q in self.handler_questions:
+            for answer in q.submitted_answers:
+                if answer.correct:
+                    answer.correct = False
+
     def restart_wrong_only(self):
         self.cur_question = 0
+        self.clear_answers()
         self.handler_questions = deepcopy(self.incorrect)
         self.total_questions = len(self.handler_questions)
         self.incorrect.clear()
+
 
 @dataclass
 class QuestionHistory:
@@ -90,14 +90,13 @@ class QuestionHistory:
     answers: list = field(default_factory=list)
     submitted_answers: list = field(default_factory=list)
 
+
 @dataclass
 class Score:
     numerator: int = 0
     denominator: int = 0
     percent: int = 0
 
-class NoMoreQuestions(Exception):
-    pass
 
-class NoQuestionAvailable(Exception):
+class NoMoreQuestions(Exception):
     pass

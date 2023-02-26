@@ -28,47 +28,56 @@ class CreateQuestion(GuiPage):
         self.primary = primary
         self.view = primary.view
         self.quiz = []
-        self.answers = []
         self.cur_question = 1
 
         self.page_layout = QGridLayout()
-
-        self.question = QPlainTextEdit()
-        self.question.setStyleSheet(self.primary.ss)
-        correct_lbl = QLabel("Correct?")
-        correct_lbl.setStyleSheet(self.primary.ss)
-        self.configure_answers(count=4, start_row=2)
-        self.save_btn = QPushButton("Save")
-        self.save_btn.setStyleSheet(self.primary.ss)
-        self.cancel_btn = QPushButton("Cancel")
-        self.cancel_btn.setStyleSheet(self.primary.ss)
-        self.finish_btn = QPushButton("Finish")
-        self.finish_btn.setStyleSheet(self.primary.ss)
-        self.question_num = QLabel("Question #")
-        self.question_num.setStyleSheet(self.primary.ss)
-
-        self.question.setPlaceholderText("QUESTION TEXT")
-        correct_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.save_btn.setEnabled(False)
-        self.save_btn.clicked.connect(self.save_pressed)
-
-        self.finish_btn.setEnabled(False)
-        self.finish_btn.clicked.connect(self.finish_pressed)
-
-        self.cancel_btn.clicked.connect(self.cancel_pressed)
-
-        self.question_num.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-
-        self.page_layout.addWidget(self.question, 0, 0, 1, 9)
-        self.page_layout.addWidget(correct_lbl, 1, 7)
-        self.page_layout.addWidget(self.cancel_btn, 6, 0, 1, 3)
-        self.page_layout.addWidget(self.finish_btn, 6, 3, 1, 3)
-        self.page_layout.addWidget(self.save_btn, 6, 6, 1, 3)
-        self.page_layout.addWidget(self.question_num, 7, 0, 1, 9)
+        self.fresh_page()
 
         self.setLayout(self.page_layout)
         self.show()
+
+    def fresh_page(self):
+        self.answers = []
+        self.question = QPlainTextEdit()
+        correct_lbl = QLabel("Correct?")
+        self.cancel_btn = QPushButton("Cancel")
+        self.save_btn = QPushButton("Save")
+        self.finish_btn = QPushButton("Finish")
+        self.add_answer_btn = QPushButton("+")
+        self.question_num = QLabel("Question #")
+        self.last_answer_row = 1
+        self.configure_answers(count=2, start_row=2)
+
+
+        self.cancel_btn.clicked.connect(self.cancel_pressed)
+        self.save_btn.clicked.connect(self.save_pressed)
+        self.finish_btn.clicked.connect(self.finish_pressed)
+        self.add_answer_btn.clicked.connect(self.add_answer_pressed)
+        self.question.textChanged.connect(self.refresh)
+        
+        self.cancel_btn.setStyleSheet(self.primary.ss)
+        self.save_btn.setStyleSheet(self.primary.ss)
+        self.finish_btn.setStyleSheet(self.primary.ss)
+        self.add_answer_btn.setStyleSheet(self.primary.ss)
+        correct_lbl.setStyleSheet(self.primary.ss)
+        self.question_num.setStyleSheet(self.primary.ss)
+        self.question.setStyleSheet(self.primary.ss)
+
+        self.save_btn.setEnabled(False)
+        self.finish_btn.setEnabled(False)
+
+        self.question_num.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        correct_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.question.setPlaceholderText("QUESTION TEXT")
+
+        self.page_layout.addWidget(self.question, 0, 0, 1, 9)
+        self.page_layout.addWidget(correct_lbl, 1, 7)
+        self.page_layout.addWidget(self.add_answer_btn, 4, 6, 1, 3)
+        self.page_layout.addWidget(self.cancel_btn, 5, 0, 1, 3)
+        self.page_layout.addWidget(self.finish_btn, 5, 3, 1, 3)
+        self.page_layout.addWidget(self.save_btn, 5, 6, 1, 3)
+        self.page_layout.addWidget(self.question_num, 6, 0, 1, 9)
 
     def configure_answers(self, count, start_row):
         for i in range(count):
@@ -86,6 +95,16 @@ class CreateQuestion(GuiPage):
             self.answers.append(gui)
             self.page_layout.addWidget(answer_line, start_row+i, 0, 1, 7)
             self.page_layout.addWidget(answer_cb, start_row+i, 7)
+            self.last_answer_row += 1
+
+    def shift_btns(self):
+        """Move all buttons down 1 row"""
+        row = self.last_answer_row + 1
+        self.page_layout.addWidget(self.add_answer_btn, row, 6, 1, 3)
+        self.page_layout.addWidget(self.cancel_btn, row + 1, 0, 1, 3)
+        self.page_layout.addWidget(self.finish_btn, row + 1, 3, 1, 3)
+        self.page_layout.addWidget(self.save_btn, row + 1, 6, 1, 3)
+        self.page_layout.addWidget(self.question_num, row + 2, 0, 1, 9)
 
     def refresh(self):
         if self.is_savable():
@@ -145,11 +164,26 @@ class CreateQuestion(GuiPage):
         self.clear_page()
         self.primary.change_page(pages.START)
 
+    def add_answer_pressed(self):
+        self.configure_answers(1, self.last_answer_row + 1)
+        self.shift_btns()
+
     @GuiPage.update_after
     def clear_page(self):
         self.question.clear()
         for answer in self.answers:
             answer.text.clear()
+        self.remove_extra_answers()
+
+    def remove_extra_answers(self):
+        answers_to_remove = self.answers[2:]
+        self.answers = self.answers[:2]
+
+        for answer in answers_to_remove:
+            self.page_layout.removeWidget(answer.text)
+            self.page_layout.removeWidget(answer.correct)
+            answer.text.deleteLater()
+            answer.correct.deleteLater()
 
     def focus(self):
         self.clear_page()

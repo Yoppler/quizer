@@ -60,14 +60,6 @@ class ResultsOverview(GuiPage):
         finish_btn.clicked.connect(self.finish_pressed)
 
         layout.addWidget(self.title,0,0,1,2)
-        """
-        layout.addWidget(self.numerator,1,2,1,1)
-
-        layout.addWidget(self.denominator,3,2,1,1)
-        layout.addWidget(equals,1,3,3,1)
-        layout.addWidget(self.percent,1,4,3,1)
-        layout.addWidget(percent_sign,1,5,3,1)
-        """
         layout.addWidget(self.score_overview,1,0,1,2)
         layout.addWidget(restart_btn,2,0,1,1)
         layout.addWidget(self.restart_wrong_btn,3,0,1,1)
