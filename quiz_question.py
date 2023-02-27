@@ -79,7 +79,6 @@ class QuizQuestion(GuiPage):
         self.refresh_question()
         self.refresh_cbs()
 
-
     def start_quiz(self, quiz_handler):
         self.quiz = quiz_handler
         self.cur_question = self.quiz.get_question()

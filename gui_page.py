@@ -1,6 +1,7 @@
 
 from PyQt6.QtWidgets import QWidget, QLayout
 
+
 class GuiPage(QWidget):
 
     @staticmethod

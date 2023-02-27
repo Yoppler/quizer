@@ -68,7 +68,6 @@ class MainWindow(QMainWindow):
 
     def edit_question(self, question):
         self.pages[pages.EDIT_QUESTION.value].question_obj = question
-        self.pages[pages.EDIT_QUESTION.value].refresh()
         self.change_page(pages.EDIT_QUESTION)
 
     def question_edited(self, question):

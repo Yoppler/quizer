@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 from gui_page import GuiPage
+from gui_constants import pages
 from quiz import Question, Answer
 
 answer_gui = namedtuple("answer_gui", ["text", "correct"])
@@ -23,28 +24,11 @@ class EditQuestion(GuiPage):
         self.setup()
 
     def setup(self):
-        layout = QGridLayout()
+        self.page_layout = QGridLayout()
         self.question = QPlainTextEdit()
         self.question.setStyleSheet(self.primary.ss)
         correct_lbl = QLabel("Correct?")
         correct_lbl.setStyleSheet(self.primary.ss)
-        answerA = QLineEdit()
-        answerA.setStyleSheet(self.primary.ss)
-        answerB = QLineEdit()
-        answerB.setStyleSheet(self.primary.ss)
-        answerC = QLineEdit()
-        answerC.setStyleSheet(self.primary.ss)
-        answerD = QLineEdit()
-        answerD.setStyleSheet(self.primary.ss)
-        answerA_cb = QCheckBox()
-        answerB_cb = QCheckBox()
-        answerC_cb = QCheckBox()
-        answerD_cb = QCheckBox()
-
-        self.answers.append(answer_gui(answerA, answerA_cb))
-        self.answers.append(answer_gui(answerB, answerB_cb))
-        self.answers.append(answer_gui(answerC, answerC_cb))
-        self.answers.append(answer_gui(answerD, answerD_cb))
 
         self.question.setPlaceholderText("QUESTION TEXT")
         correct_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -56,29 +40,40 @@ class EditQuestion(GuiPage):
         self.save_btn.clicked.connect(self.save_pressed)
         self.cancel_btn.clicked.connect(self.cancel_pressed)
 
-        layout.addWidget(self.question, 0, 0, 1, 9)
-        layout.addWidget(correct_lbl, 1, 7)
-        layout.addWidget(answerA, 2, 0, 1, 7)
-        layout.addWidget(answerA_cb, 2, 7)
-        layout.addWidget(answerB, 3, 0, 1, 7)
-        layout.addWidget(answerB_cb, 3, 7)
-        layout.addWidget(answerC, 4, 0, 1, 7)
-        layout.addWidget(answerC_cb, 4, 7)
-        layout.addWidget(answerD, 5, 0, 1, 7)
-        layout.addWidget(answerD_cb, 5, 7)
-        layout.addWidget(self.cancel_btn, 6, 0, 1, 3)
-        layout.addWidget(self.save_btn, 6, 6, 1, 3)
-        self.setLayout(layout)
+        self.page_layout.addWidget(self.question, 0, 0, 1, 9)
+        self.page_layout.addWidget(correct_lbl, 1, 7)
+        self.page_layout.addWidget(self.cancel_btn, 6, 0, 1, 3)
+        self.page_layout.addWidget(self.save_btn, 6, 6, 1, 3)
+        self.setLayout(self.page_layout)
         self.show()
 
+    def configure_answers(self, count, start_row):
+        for i in range(count):
+            row = start_row + i
+            answer_line = QLineEdit()
+            answer_cb = QCheckBox()
+
+            answer_line.setStyleSheet(self.primary.ss)
+            self.answers.append(answer_gui(answer_line, answer_cb))
+            self.page_layout.addWidget(answer_line, row, 0, 1, 7)
+            self.page_layout.addWidget(answer_cb, row, 7)
+
     def refresh(self):
-        if not self.question:
+        if not self.question_obj:
             return
 
         self.question.setPlainText(self.question_obj.text)
+        self.configure_answers(
+                count=len(self.question_obj.answers),
+                start_row=2)
+
         for answer, answer_gui in zip(self.question_obj.answers, self.answers):
             answer_gui.text.setText(answer.text)
             answer_gui.correct.setChecked(answer.correct)
+        
+        row = len(self.question_obj.answers) + 2
+        self.page_layout.addWidget(self.cancel_btn, row, 0, 1, 3)
+        self.page_layout.addWidget(self.save_btn, row, 6, 1, 3)
 
     def save_pressed(self):
         q = Question(self.question.toPlainText())
@@ -94,10 +89,13 @@ class EditQuestion(GuiPage):
 
     def cancel_pressed(self):
         self.clear()
-        self.primary.go_back()
+        self.primary.change_page(pages.EDIT_OVERVIEW)
 
     def clear(self):
         self.question.setPlainText("")
         for a in self.answers:
-            a.text.setText("")
-            a.correct.setChecked(False)
+            a.text.deleteLater()
+            a.correct.deleteLater()
+            self.page_layout.removeWidget(a.text)
+            self.page_layout.removeWidget(a.correct)
+        self.answers.clear()
