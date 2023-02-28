@@ -22,6 +22,7 @@ class EditQuestion(GuiPage):
         self.question_obj = None
         self.answers = []
         self.setup()
+        self.last_answer_row = 1
 
     def setup(self):
         self.page_layout = QGridLayout()
@@ -29,6 +30,9 @@ class EditQuestion(GuiPage):
         self.question.setStyleSheet(self.primary.ss)
         correct_lbl = QLabel("Correct?")
         correct_lbl.setStyleSheet(self.primary.ss)
+        self.add_answer_btn = QPushButton("+")
+        self.add_answer_btn.setStyleSheet(self.primary.ss)
+        self.add_answer_btn.clicked.connect(self.add_answer_pressed)
 
         self.question.setPlaceholderText("QUESTION TEXT")
         correct_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -42,21 +46,25 @@ class EditQuestion(GuiPage):
 
         self.page_layout.addWidget(self.question, 0, 0, 1, 9)
         self.page_layout.addWidget(correct_lbl, 1, 7)
-        self.page_layout.addWidget(self.cancel_btn, 6, 0, 1, 3)
-        self.page_layout.addWidget(self.save_btn, 6, 6, 1, 3)
+        self.page_layout.addWidget(self.add_answer_btn, 6, 6, 1, 3)
+        self.page_layout.addWidget(self.cancel_btn, 7, 0, 1, 3)
+        self.page_layout.addWidget(self.save_btn, 7, 6, 1, 3)
         self.setLayout(self.page_layout)
         self.show()
 
-    def configure_answers(self, count, start_row):
+    def configure_answers(self, count, start_row, placeholder=False):
         for i in range(count):
             row = start_row + i
             answer_line = QLineEdit()
+            if placeholder:
+                answer_line.setPlaceholderText("ANSWER TEXT")
             answer_cb = QCheckBox()
 
             answer_line.setStyleSheet(self.primary.ss)
             self.answers.append(answer_gui(answer_line, answer_cb))
             self.page_layout.addWidget(answer_line, row, 0, 1, 7)
             self.page_layout.addWidget(answer_cb, row, 7)
+            self.last_answer_row += 1
 
     def refresh(self):
         if not self.question_obj:
@@ -72,8 +80,9 @@ class EditQuestion(GuiPage):
             answer_gui.correct.setChecked(answer.correct)
         
         row = len(self.question_obj.answers) + 2
-        self.page_layout.addWidget(self.cancel_btn, row, 0, 1, 3)
-        self.page_layout.addWidget(self.save_btn, row, 6, 1, 3)
+        self.page_layout.addWidget(self.cancel_btn, row + 1, 0, 1, 3)
+        self.page_layout.addWidget(self.save_btn, row + 1, 6, 1, 3)
+        self.page_layout.addWidget(self.add_answer_btn, row, 6, 1, 3)
 
     def save_pressed(self):
         q = Question(self.question.toPlainText())
@@ -90,6 +99,16 @@ class EditQuestion(GuiPage):
     def cancel_pressed(self):
         self.clear()
         self.primary.change_page(pages.EDIT_OVERVIEW)
+
+    def shift_btns(self):
+        row = self.last_answer_row + 1
+        self.page_layout.addWidget(self.add_answer_btn, row, 6, 1, 3)
+        self.page_layout.addWidget(self.cancel_btn, row + 1, 0, 1, 3)
+        self.page_layout.addWidget(self.save_btn, row + 1, 6, 1, 3)
+
+    def add_answer_pressed(self):
+        self.configure_answers(1, self.last_answer_row + 1, placeholder=True)
+        self.shift_btns()
 
     def clear(self):
         self.question.setPlainText("")
