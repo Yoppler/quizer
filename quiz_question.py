@@ -25,39 +25,40 @@ class QuizQuestion(GuiPage):
         self.view = primary.view
         self.quiz = None
         self.answers = []
+        self.last_answer_row = 0
         self.setup()
 
     def clear(self):
         self.quiz = None
 
     def setup(self):
-        self.widget_layout = QGridLayout()
+        self.page_layout = QGridLayout()
         self.cur_question = None
         self.question = QLabel("Default Question Text")
         self.question.setWordWrap(True)
         self.question.setStyleSheet(self.primary.ss)
 
-        back_btn = QPushButton("←")
-        back_btn.setStyleSheet(self.primary.ss)
-        forward_btn = QPushButton("→")
-        forward_btn.setStyleSheet(self.primary.ss)
+        self.back_btn = QPushButton("←")
+        self.back_btn.setStyleSheet(self.primary.ss)
+        self.forward_btn = QPushButton("→")
+        self.forward_btn.setStyleSheet(self.primary.ss)
         self.progress = QProgressBar()
         self.progress.setStyleSheet(self.primary.ss)
 
         self.question.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.question.setFrameStyle(QFrame.Shape.Panel)
 
-        back_btn.clicked.connect(self.back_clicked)
-        forward_btn.clicked.connect(self.forward_clicked)
+        self.back_btn.clicked.connect(self.back_clicked)
+        self.forward_btn.clicked.connect(self.forward_clicked)
 
-        self.widget_layout.addWidget(self.question, 0, 0, 5, 6)
-        self.init_answers(4, 7)
+        self.page_layout.addWidget(self.question, 0, 0, 1, 6)
+        # self.init_answers(4, 7)
 
-        self.widget_layout.addWidget(back_btn, 11, 0, 1, 2)
-        self.widget_layout.addWidget(self.progress, 11, 2, 1, 2)
-        self.widget_layout.addWidget(forward_btn, 11, 4, 1, 2)
+        # self.page_layout.addWidget(back_btn, 11, 0, 1, 2)
+        # self.page_layout.addWidget(self.progress, 11, 2, 1, 2)
+        # self.page_layout.addWidget(forward_btn, 11, 4, 1, 2)
 
-        self.setLayout(self.widget_layout)
+        self.setLayout(self.page_layout)
         self.show()
 
     def init_answers(self, count, start_row):
@@ -70,8 +71,16 @@ class QuizQuestion(GuiPage):
             self.answers.append(answer_gui(answer_line, answer_cb))
 
             row = start_row + i
-            self.widget_layout.addWidget(answer_line, row, 0, 1, 5)
-            self.widget_layout.addWidget(answer_cb, row, 5, 1, 1)
+            self.page_layout.addWidget(answer_line, row, 0, 1, 5)
+            self.page_layout.addWidget(answer_cb, row, 5, 1, 1)
+        self.last_answer_row = count + start_row
+        self.shift_btns()
+
+    def shift_btns(self):
+        row = self.last_answer_row + 1
+        self.page_layout.addWidget(self.back_btn, row, 0, 1, 2)
+        self.page_layout.addWidget(self.progress, row, 2, 1, 2)
+        self.page_layout.addWidget(self.forward_btn, row, 4, 1, 2)
 
     def refresh(self):
         if self.cur_question is None:
@@ -117,9 +126,19 @@ class QuizQuestion(GuiPage):
         self.progress.setValue(self.cur_question_num)
 
     def refresh_question(self):
+        self.clear_answers()
         self.question.setText(self.cur_question.text)
+        self.init_answers(len(self.cur_question.answers), 2)
         for answers, gui in zip(self.cur_question.answers, self.answers):
             gui.line.setText(answers.text)
+
+    def clear_answers(self):
+        for gui in self.answers:
+            self.page_layout.removeWidget(gui.line)
+            self.page_layout.removeWidget(gui.cb)
+            gui.line.deleteLater()
+            gui.cb.deleteLater()
+        self.answers.clear()
 
     def refresh_cbs(self):
         if len(self.cur_question.submitted_answers) == 0:

@@ -81,7 +81,6 @@ class MainWindow(QMainWindow):
 
     def results_details(self, handler):
         self.pages[pages.RESULTS_DETAILS.value].handler = handler
-        self.pages[pages.RESULTS_DETAILS.value].refresh()
         self.change_page(pages.RESULTS_DETAILS)
 
     def go_back(self):
