@@ -27,22 +27,23 @@ class EditQuestion(GuiPage):
     def setup(self):
         self.page_layout = QGridLayout()
         self.question = QPlainTextEdit()
-        self.question.setStyleSheet(self.primary.ss)
         correct_lbl = QLabel("Correct?")
-        correct_lbl.setStyleSheet(self.primary.ss)
         self.add_answer_btn = QPushButton("+")
+        self.save_btn = QPushButton("Save")
+        self.cancel_btn = QPushButton("Cancel")
+
+        correct_lbl.setStyleSheet(self.primary.ss)
         self.add_answer_btn.setStyleSheet(self.primary.ss)
+        self.question.setStyleSheet(self.primary.ss)
+        self.save_btn.setStyleSheet(self.primary.ss)
+        self.cancel_btn.setStyleSheet(self.primary.ss)
+
         self.add_answer_btn.clicked.connect(self.add_answer_pressed)
+        self.save_btn.clicked.connect(self.save_pressed)
+        self.cancel_btn.clicked.connect(self.cancel_pressed)
 
         self.question.setPlaceholderText("QUESTION TEXT")
         correct_lbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.save_btn = QPushButton("Save")
-        self.save_btn.setStyleSheet(self.primary.ss)
-        self.cancel_btn = QPushButton("Cancel")
-        self.cancel_btn.setStyleSheet(self.primary.ss)
-        self.save_btn.clicked.connect(self.save_pressed)
-        self.cancel_btn.clicked.connect(self.cancel_pressed)
 
         self.page_layout.addWidget(self.question, 0, 0, 1, 9)
         self.page_layout.addWidget(correct_lbl, 1, 7)
@@ -56,9 +57,10 @@ class EditQuestion(GuiPage):
         for i in range(count):
             row = start_row + i
             answer_line = QLineEdit()
+            answer_cb = QCheckBox()
+
             if placeholder:
                 answer_line.setPlaceholderText("ANSWER TEXT")
-            answer_cb = QCheckBox()
 
             answer_line.setStyleSheet(self.primary.ss)
             self.answers.append(answer_gui(answer_line, answer_cb))
@@ -78,7 +80,7 @@ class EditQuestion(GuiPage):
         for answer, answer_gui in zip(self.question_obj.answers, self.answers):
             answer_gui.text.setText(answer.text)
             answer_gui.correct.setChecked(answer.correct)
-        
+
         row = len(self.question_obj.answers) + 2
         self.page_layout.addWidget(self.cancel_btn, row + 1, 0, 1, 3)
         self.page_layout.addWidget(self.save_btn, row + 1, 6, 1, 3)

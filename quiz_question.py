@@ -32,32 +32,27 @@ class QuizQuestion(GuiPage):
         self.quiz = None
 
     def setup(self):
-        self.page_layout = QGridLayout()
         self.cur_question = None
+
+        self.page_layout = QGridLayout()
         self.question = QLabel("Default Question Text")
-        self.question.setWordWrap(True)
-        self.question.setStyleSheet(self.primary.ss)
-
         self.back_btn = QPushButton("←")
-        self.back_btn.setStyleSheet(self.primary.ss)
         self.forward_btn = QPushButton("→")
-        self.forward_btn.setStyleSheet(self.primary.ss)
         self.progress = QProgressBar()
-        self.progress.setStyleSheet(self.primary.ss)
 
-        self.question.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.question.setFrameStyle(QFrame.Shape.Panel)
+        self.question.setStyleSheet(self.primary.ss)
+        self.back_btn.setStyleSheet(self.primary.ss)
+        self.forward_btn.setStyleSheet(self.primary.ss)
+        self.progress.setStyleSheet(self.primary.ss)
 
         self.back_btn.clicked.connect(self.back_clicked)
         self.forward_btn.clicked.connect(self.forward_clicked)
 
+        self.question.setWordWrap(True)
+        self.question.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.question.setFrameStyle(QFrame.Shape.Panel)
+
         self.page_layout.addWidget(self.question, 0, 0, 1, 6)
-        # self.init_answers(4, 7)
-
-        # self.page_layout.addWidget(back_btn, 11, 0, 1, 2)
-        # self.page_layout.addWidget(self.progress, 11, 2, 1, 2)
-        # self.page_layout.addWidget(forward_btn, 11, 4, 1, 2)
-
         self.setLayout(self.page_layout)
         self.show()
 
@@ -144,7 +139,8 @@ class QuizQuestion(GuiPage):
         if len(self.cur_question.submitted_answers) == 0:
             self.reset_cbs()
         else:
-            for answer, gui in zip(self.cur_question.submitted_answers, self.answers):
+            for answer, gui in zip(
+                    self.cur_question.submitted_answers, self.answers):
                 gui.cb.setChecked(answer.correct)
 
     def reset_cbs(self):

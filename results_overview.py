@@ -1,7 +1,6 @@
 from PyQt6.QtWidgets import (
         QGridLayout,
         QLabel,
-        QFrame,
         QPushButton,
 )
 from PyQt6.QtCore import Qt
@@ -23,50 +22,44 @@ class ResultsOverview(GuiPage):
         self.score = None
 
     def setup(self):
-        layout = QGridLayout()
+        self.page_layout = QGridLayout()
         self.title = QLabel()
-        self.numerator = QLabel()
-        line = QFrame()
-        self.denominator = QLabel()
-        equals = QLabel("=")
-        self.percent = QLabel()
-        percent_sign = QLabel("%")
         restart_btn = QPushButton("Restart")
-        restart_btn.setStyleSheet(self.primary.ss)
         self.restart_wrong_btn = QPushButton("Restart Wrong Only")
-        self.restart_wrong_btn.setStyleSheet(self.primary.ss)
         details_btn = QPushButton("Details")
-        details_btn.setStyleSheet(self.primary.ss)
-        details_btn.clicked.connect(self.details_pressed)
         finish_btn = QPushButton("Finish")
+        self.score_overview = QLabel()
+        title_font = QFont()
+        overview_font = QFont()
+
+        restart_btn.setStyleSheet(self.primary.ss)
+        self.restart_wrong_btn.setStyleSheet(self.primary.ss)
+        details_btn.setStyleSheet(self.primary.ss)
         finish_btn.setStyleSheet(self.primary.ss)
 
-        self.score_overview = QLabel()
-
-        self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_font = QFont()
         title_font.setPointSize(20)
         title_font.setBold(True)
+        self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.title.setFont(title_font)
         self.title.setWordWrap(True)
 
-        self.score_overview.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        overview_font = QFont()
         overview_font.setPointSize(20)
+        self.score_overview.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.score_overview.setFont(overview_font)
 
         restart_btn.clicked.connect(self.restart_pressed)
         self.restart_wrong_btn.clicked.connect(self.restart_wrong_pressed)
         finish_btn.clicked.connect(self.finish_pressed)
+        details_btn.clicked.connect(self.details_pressed)
 
-        layout.addWidget(self.title,0,0,1,2)
-        layout.addWidget(self.score_overview,1,0,1,2)
-        layout.addWidget(restart_btn,2,0,1,1)
-        layout.addWidget(self.restart_wrong_btn,3,0,1,1)
-        layout.addWidget(details_btn,2,1,1,1)
-        layout.addWidget(finish_btn,3,1,1,1)
+        self.page_layout.addWidget(self.title, 0, 0, 1, 2)
+        self.page_layout.addWidget(self.score_overview, 1, 0, 1, 2)
+        self.page_layout.addWidget(restart_btn, 2, 0, 1, 1)
+        self.page_layout.addWidget(self.restart_wrong_btn, 3, 0, 1, 1)
+        self.page_layout.addWidget(details_btn, 2, 1, 1, 1)
+        self.page_layout.addWidget(finish_btn, 3, 1, 1, 1)
 
-        self.setLayout(layout)
+        self.setLayout(self.page_layout)
         self.show()
 
     def refresh(self):
@@ -76,12 +69,13 @@ class ResultsOverview(GuiPage):
         if self.score is None:
             self.score = self.handler.calculate_score()
 
-        self.title.setText(self.handler.get_title())
-        self.numerator.setText(str(self.score.numerator))
-        self.denominator.setText(str(self.score.denominator))
-        self.percent.setText(str(self.score.percent))
+        num = self.score.numerator
+        denom = self.score.denominator
+        per = self.score.percent
+        overview = f"{num}/{denom} = {per}%"
 
-        self.score_overview.setText(f"{self.score.numerator}/{self.score.denominator} = {self.score.percent}%")
+        self.title.setText(self.handler.get_title())
+        self.score_overview.setText(overview)
 
         if len(self.handler.incorrect) == 0:
             self.restart_wrong_btn.setEnabled(False)

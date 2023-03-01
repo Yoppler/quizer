@@ -47,7 +47,8 @@ class QuizHandler:
         score = 0
 
         for question in questions_submitted:
-            for c_answer, s_answer in zip(question.answers, question.submitted_answers):
+            for c_answer, s_answer in zip(
+                    question.answers, question.submitted_answers):
                 if c_answer != s_answer:
                     self.incorrect.append(question)
                     break
