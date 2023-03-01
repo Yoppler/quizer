@@ -10,7 +10,7 @@ $ python ./main.py
 * PyQt6
 
 ### To-Do List
-- [ ] Implement variable answer quantities
+- [X] Implement variable answer quantities - (02/28/2023)
 - [ ] Implement option for randomized question order
 - [ ] Implement option for randomized answer order
 - [ ] Implement 'add question' functionality in editor
