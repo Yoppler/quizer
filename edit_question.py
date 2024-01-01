@@ -53,7 +53,9 @@ class EditQuestion(GuiPage):
         self.setLayout(self.page_layout)
         self.show()
 
+    # Should be Renamed to add_answers?
     def configure_answers(self, count, start_row, placeholder=False):
+
         for i in range(count):
             row = start_row + i
             answer_line = QLineEdit()

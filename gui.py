@@ -24,6 +24,7 @@ class MainWindow(QMainWindow):
         self.current_quiz = None
         self.pages = []
         self.ss = "font-size:12pt"
+        self.setWindowTitle("Quizer")
 
         self.init_page(StartPage)
         self.init_page(CreateQuestion)
