@@ -61,8 +61,10 @@ class EditOverview(GuiPage):
     def item_selected(self):
         if len(self.question_list.selectedItems()) == 1:
             self.edit_btn.setEnabled(True)
+            self.delete_btn.setEnabled(True)
         else:
             self.edit_btn.setEnabled(False)
+            self.delete_btn.setEnabled(False)
 
     def refresh(self):
         if not self.editor:
@@ -75,28 +77,36 @@ class EditOverview(GuiPage):
         if not self.editor:
             self.editor = QuizEditor(self.name)
 
-        if self.edited_question is not None:
+        if self.editor.edited:
             self.save_btn.setEnabled(True)
-            self.editor.replace_question(self.question_obj,
-                                         self.edited_question)
-            self.edited_question = None
+            if self.edited_question is not None:
+                self.editor.replace_question(self.question_obj,
+                                             self.edited_question)
+                self.edited_question = None
 
         for question in self.editor.quiz.questions:
             self.question_list.addItem(question.text)
 
     def clear(self):
         #self.question_obj = None
-        self.editor = None
+        #self.editor = None
         self.question_list.clear()
 
     def add_pressed(self):
         pass
 
     def delete_pressed(self):
-        pass
+        selection = self.question_list.selectedItems()
+        if len(selection) == 0:
+            return
+        question = selection[0].text()
+        question_obj = self.editor.get_question_by_text(question)
+        self.editor.delete_question(question_obj)
+        self.refresh()
 
     def cancel_pressed(self):
         self.clear()
+        self.editor = None
         self.primary.return_to_home()
 
     def edit_pressed(self):

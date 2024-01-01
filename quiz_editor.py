@@ -28,7 +28,15 @@ class QuizEditor:
         index = self.get_question_index_by_text(old.text)
         if index is not None:
             self.quiz.questions[index] = new
-        self.edited = True
+            self.edited = True
+
+    def delete_question(self, question):
+        index = self.get_question_index_by_text(question.text)
+        if index is not None:
+            # Delete question from quiz questions array
+            del self.quiz.questions[index]
+            self.edited=True
+
 
     def edit_question(self, index, question):
         self.quiz.questions[index] = question
@@ -40,3 +48,4 @@ class QuizEditor:
         content = json.dumps(self.quiz.questions, default=vars)
         view.delete_quiz()
         view.create_quiz(content)
+        self.edited = False
