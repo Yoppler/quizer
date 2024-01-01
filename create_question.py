@@ -60,11 +60,13 @@ class CreateQuestion(GuiPage):
         # TODO: Theoretically we can set configurable default
         self.configure_answers(count=2, start_row=2)
 
+
+        '''
         # Initialize tabflow
         self.setTabOrder(self.add_answer_btn, self.save_btn)
         self.setTabOrder(self.save_btn, self.finish_btn)
         self.setTabOrder(self.finish_btn, self.cancel_btn)
-
+        '''
 
         self.cancel_btn.clicked.connect(self.cancel_pressed)
         self.save_btn.clicked.connect(self.save_pressed)
@@ -120,11 +122,15 @@ class CreateQuestion(GuiPage):
             self.last_answer_row += 1
 
             # TODO: Fix tab flow problem 
+            '''
             self.setTabOrder(self.answers[-1].text, self.answers[-1].correct)
             self.setTabOrder(self.answers[-1].correct, self.add_answer_btn) 
             if len(self.answers) >= 2:
                 self.setTabOrder(self.answers[-2].correct, self.answers[-1].text)
-                self.answers[-1].text.setFocus()
+            '''
+            self.answers[-1].text.setFocus()
+            self.reset_tab_order()
+            
 
     # Possibly call it "control buttons"
     def shift_btns(self):
@@ -233,3 +239,15 @@ class CreateQuestion(GuiPage):
     # TODO: I wonder what this was a fix for
     def focus(self):
         self.clear_page()
+
+    def reset_tab_order(self):
+        self.setTabOrder(self.question, self.answers[0].text)
+        self.setTabOrder(self.answers[0].text, self.answers[0].correct)
+        for i, answer in enumerate(self.answers[1:]):
+            self.setTabOrder(self.answers[i].correct, answer.text)
+            self.setTabOrder(answer.text, answer.correct)
+            self.setTabOrder(answer.correct, self.add_answer_btn)
+        self.setTabOrder(self.add_answer_btn, self.save_btn)
+        self.setTabOrder(self.save_btn, self.finish_btn)
+        self.setTabOrder(self.finish_btn, self.cancel_btn)
+        self.setTabOrder(self.cancel_btn, self.question)
