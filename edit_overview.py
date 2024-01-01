@@ -27,6 +27,10 @@ class EditOverview(GuiPage):
         self.question_list.setWordWrap(True)
         self.question_list.setAlternatingRowColors(True)
         self.question_list.setSpacing(5)
+        self.add_btn = QPushButton("Add")
+        self.add_btn.setStyleSheet(self.primary.ss)
+        self.delete_btn = QPushButton("Delete")
+        self.delete_btn.setStyleSheet(self.primary.ss)
         cancel_btn = QPushButton("Cancel")
         cancel_btn.setStyleSheet(self.primary.ss)
         self.edit_btn = QPushButton("Edit")
@@ -34,16 +38,22 @@ class EditOverview(GuiPage):
         self.save_btn = QPushButton("Save")
         self.save_btn.setStyleSheet(self.primary.ss)
 
+        self.add_btn.setEnabled(True)
+        self.delete_btn.setEnabled(False)
         self.edit_btn.setEnabled(False)
         self.save_btn.setEnabled(False)
         cancel_btn.clicked.connect(self.cancel_pressed)
+        self.add_btn.clicked.connect(self.add_pressed)
+        self.delete_btn.clicked.connect(self.delete_pressed)
         self.edit_btn.clicked.connect(self.edit_pressed)
         self.save_btn.clicked.connect(self.save_pressed)
 
         layout.addWidget(self.question_list, 0, 0, 3, 3)
-        layout.addWidget(cancel_btn, 3, 0, 1, 1)
-        layout.addWidget(self.edit_btn, 3, 1, 1, 1)
-        layout.addWidget(self.save_btn, 3, 2, 1, 1)
+        layout.addWidget(self.delete_btn, 3, 0, 1, 1)
+        layout.addWidget(self.add_btn, 3, 2, 1, 1)
+        layout.addWidget(cancel_btn, 4, 0, 1, 1)
+        layout.addWidget(self.edit_btn, 4, 1, 1, 1)
+        layout.addWidget(self.save_btn, 4, 2, 1, 1)
 
         self.setLayout(layout)
         self.show()
@@ -78,6 +88,12 @@ class EditOverview(GuiPage):
         #self.question_obj = None
         self.editor = None
         self.question_list.clear()
+
+    def add_pressed(self):
+        pass
+
+    def delete_pressed(self):
+        pass
 
     def cancel_pressed(self):
         self.clear()
